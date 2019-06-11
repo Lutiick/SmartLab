@@ -20,9 +20,11 @@ class Plate:
         self.data = {}
 
     def reloadData(self):
-        req = requests.get(self.ip).text
-        self.data = {x.split(':')[0]:x.split(':')[1] for x in req.split()}
-        print(self.data)
+        try:
+            req = requests.get(self.ip).text
+            self.data = {x.split(':')[0]:x.split(':')[1] for x in req.split()}
+        except:
+            print(f'can not reload ({self.name}, {self.ip})')
     
     def getData(self):
         return self.data
@@ -85,9 +87,12 @@ class Server(SimpleHTTPRequestHandler):
         climat = []
         for plate in plates:
             data = plate.getData()
-            if plate.getType() == 'relay':
+            if not data:
+                continue
+            plate_type = plate.getType()
+            if plate_type == 'relay':
                 relays.append(f'<li class="relay">Plate - {plate.name}:<button id="{plate.name}" class="switch {data["status"]}">switch</button> Current: {data["current"]}; Power: {data["power"]}</li>')
-            elif plate.getType() == 'climat':
+            elif plate_type == 'climat':
                 print(data)
                 climat.append(f'<li class="climat">Plate - {plate.name}: hum: {data["humidity"]}; temp: {data["temperature"]}; press: {data["pressure"]}</li>')
         page = INDEX.format_map({'relays': '\n'.join(relays), 'climat': '\n'.join(climat)})
