@@ -8,11 +8,6 @@ import urllib.parse
 import os
 INDEX = open('index.html', 'r').read()
 
-class Default(dict):
-    def __missing__(self, key):
-        return ''
-
-
 class Plate:
     def __init__(self, ip, name):
         self.ip = ip
@@ -93,7 +88,6 @@ class Server(SimpleHTTPRequestHandler):
             if plate_type == 'relay':
                 relays.append(f'<li class="relay">Plate - {plate.name}:<button id="{plate.name}" class="switch {data["status"]}">switch</button> Current: {data["current"]}; Power: {data["power"]}</li>')
             elif plate_type == 'climat':
-                print(data)
                 climat.append(f'<li class="climat">Plate - {plate.name}: hum: {data["humidity"]}; temp: {data["temperature"]}; press: {data["pressure"]}</li>')
         page = INDEX.format_map({'relays': '\n'.join(relays), 'climat': '\n'.join(climat)})
         self.send_response(200)
@@ -155,15 +149,19 @@ class Server(SimpleHTTPRequestHandler):
 if __name__ == '__main__':
     HOST_NAME = 'localhost'
     PORT_NUMBER = 80
+    PLATES_IPS_FILE = open('plates_ips_names.csv', 'r')
+
     types = {
         'relay': Relay,
         'climat': Climat
     }
-    plates = [st.split(';') for st in open('plates.csv', 'r').read().split('\n')]
+    plates = [st.split(';') for st in PLATES_IPS_FILE.read().split('\n')]
     plates = [types[plate[0]](*plate[1:]) for plate in plates]
     relayIpByName = {plate.name: plate for plate in plates if plate.getType() == 'relay'}
+
     for i in plates:
         i.reloadData()
+        
     httpd = ThreadedHTTPServer((HOST_NAME, PORT_NUMBER), Server)
     try:
         server_thread = threading.Thread(target=httpd.serve_forever)

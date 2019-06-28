@@ -1,13 +1,12 @@
 let lst = document.getElementsByClassName('switch')
 for (let btn of lst) {
     btn.addEventListener('click', () => {
-        if (window.XMLHttpRequest) { // Mozilla, Safari, ...
+        if (window.XMLHttpRequest) {
             httpRequest = new XMLHttpRequest();
             if (httpRequest.overrideMimeType) {
                 httpRequest.overrideMimeType('text/xml');
-                // Читайте ниже об этой строке
             }
-        } else if (window.ActiveXObject) { // IE
+        } else if (window.ActiveXObject) {
             try {
                 httpRequest = new ActiveXObject("Msxml2.XMLHTTP");
             } catch (e) {
@@ -17,28 +16,26 @@ for (let btn of lst) {
             }
         }
         if ('on' in btn.classList) {
-            console.log('hello')
             httpRequest.onreadystatechange = () => {
                 if (httpRequest.readyState == 4) {
                     if (httpRequest.status == 200) {
                         btn.classList.remove('on');
                         btn.classList.add('off');
                     } else {
-                        alert('С запросом возникла проблема.');
+                        
                     }
                 }
             };
             url = document.location.origin + "/on?name=" + btn.id  
         }
         else {
-            console.log('by')
             httpRequest.onreadystatechange = () => {
                 if (httpRequest.readyState == 4) {
                     if (httpRequest.status == 200) {
                         btn.classList.add('on');
                         btn.classList.remove('off');
                     } else {
-                        alert('С запросом возникла проблема.');
+
                     }
                 }
             };
