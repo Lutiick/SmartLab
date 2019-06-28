@@ -149,7 +149,7 @@ class Server(SimpleHTTPRequestHandler):
 if __name__ == '__main__':
     HOST_NAME = 'localhost'
     PORT_NUMBER = 80
-    PLATES_IPS_FILE = open('plates_ips_names.csv', 'r')
+    PLATES_IPS_FILE = open('plates_ips.csv', 'r')
 
     types = {
         'relay': Relay,
